@@ -7,9 +7,9 @@ function drawChart() {
     //['Day',  'yellow', 'green'],
     data.addColumn('string', 'Day');
     data.addColumn('number', 'Yellow');
-    data.addColumn({type: 'string', role: 'style'})
+    data.addColumn({type: 'string', role: 'style'});
     data.addColumn('number', 'Green');
-    data.addColumn({type: 'string', role: 'style'})
+    data.addColumn({type: 'string', role: 'style'});
     data.addRows([
                      ['2016-03-15',  9, 'color: yellow; stroke-width: 0', 2, 'color: green; stroke-width: 0'],
                      ['2016-03-18', 10, 'color: yellow; stroke-width: 0', 4, 'color: green; stroke-width: 0'],
