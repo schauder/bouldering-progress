@@ -1,0 +1,14 @@
+[{ 
+    day: 2016-03-26,
+    progress: [
+    { 
+        category: "yellow",
+        value: 0
+    },
+    { 
+        category: "green",
+        value: 5
+    }
+    ]
+}
+]
