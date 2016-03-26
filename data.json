@@ -1,14 +1,18 @@
-[{ 
-    day: 2016-03-26,
-    progress: [
-    { 
-        category: "yellow",
-        value: 0
-    },
-    { 
-        category: "green",
-        value: 5
-    }
-    ]
+[{
+    "day": "2016-03-18",
+    "yellow": -0,
+    "green": 4
+},{
+    "day": "2016-03-20",
+    "yellow": -0,
+    "green": 5
+},{
+    "day": "2016-03-24",
+    "yellow": -0,
+    "green": 7
+},{
+    "day": "2016-03-26",
+    "yellow": -0,
+    "green": 7
 }
 ]
