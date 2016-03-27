@@ -2,33 +2,15 @@
 google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(displayBoulderingData);
 
-function loadData() {
-    return [{
-        "day": "2016-03-18",
-        "yellow": -3,
-        "green": 4
-    },{
-        "day": "2016-03-20",
-        "yellow": -2,
-        "green": 5
-    },{
-        "day": "2016-03-24",
-        "yellow": -1,
-        "green": 7
-    },{
-        "day": "2016-03-26",
-        "yellow": -0,
-        "green": 7
-    }
-    ];
-    /*
-    [
-        ['2016-03-15',  9, 'color: yellow; stroke-width: 0', 2, 'color: green; stroke-width: 0'],
-        ['2016-03-18', 10, 'color: yellow; stroke-width: 0', 4, 'color: green; stroke-width: 0'],
-        ['2016-03-20', 10, 'color: yellow; stroke-width: 0', 5, 'color: green; stroke-width: 0'],
-        ['2016-03-24', 10, 'color: yellow; stroke-width: 0', 6, 'color: green; stroke-width: 0']
-    ]
-    */
+function loadData(dataProcessor) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+            dataProcessor( JSON.parse(xhttp.responseText));
+        }
+    };
+    xhttp.open("GET", "data.json", true);
+    xhttp.send();
 }
 
 
@@ -71,8 +53,9 @@ function createDiagram(rows) {
 
 function displayBoulderingData() {
 
-    var originalData = loadData();
-    var dataInGoogleFormat = transform(originalData);
-    createDiagram(dataInGoogleFormat);
-
+    loadData(
+        function(data) {
+            createDiagram(transform(data));
+        }
+    );
 }
