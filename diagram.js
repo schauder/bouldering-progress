@@ -2,6 +2,13 @@
 google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(displayBoulderingData);
 
+var colors = ["yellow", "green"];
+
+function isNegativeZero(n) {
+    n = Number(n);
+    return (n === 0) && (1 / n === -Infinity);
+}
+
 /**
  * loads the data and passes it (parsed from json) to the function given as a parameter
  *
@@ -24,11 +31,39 @@ function loadData(dataProcessor) {
  * @returns {Array} of rows as required by google charts
  */
 function transform(originalData) {
+
+    var scaling = {};
+    colors.forEach(function (color) {
+        var min = originalData.reduce(function (previous, row) {
+            return Math.min(previous, row[color])
+        }, 0);
+        console.log(min);
+
+        var max = null;
+        if (min < 0) {
+            max = 1 + originalData.reduce(function(previous, row) {
+                    return Math.max(previous, row[color])
+                }, 0) - min;
+        }
+        scaling[color] = max;
+    });
+
+    console.log(scaling);
+
+
+
+    function translate(color, value){
+        if (value < 0 || isNegativeZero(value))
+            return scaling[color] + value;
+        else
+            return value;
+    }
+
     return originalData.map(function (inputRow) {
         return [
             inputRow.day,
-            inputRow.yellow, 'color: yellow; stroke-width: 0',
-            inputRow.green, 'color: green; stroke-width: 0'
+            translate("yellow", inputRow.yellow), 'color: yellow; stroke-width: 0',
+            translate("green", inputRow.green), 'color: green; stroke-width: 0'
         ];
     });
 }
