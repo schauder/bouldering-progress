@@ -24,18 +24,13 @@ function loadData(dataProcessor) {
  * @returns {Array} of rows as required by google charts
  */
 function transform(originalData) {
-    var rows = [];
-    for (var i = 0; i < originalData.length; i++) {
-        var inputRow = originalData[i];
-        var row = [
+    return originalData.map(function (inputRow) {
+        return [
             inputRow.day,
             inputRow.yellow, 'color: yellow; stroke-width: 0',
             inputRow.green, 'color: green; stroke-width: 0'
         ];
-        rows.push(row);
-    }
-
-    return rows;
+    });
 }
 
 /**
