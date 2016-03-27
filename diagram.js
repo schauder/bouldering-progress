@@ -2,6 +2,11 @@
 google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(displayBoulderingData);
 
+/**
+ * loads the data and passes it (parsed from json) to the function given as a parameter
+ *
+ * @param dataProcessor the function that will get called, with the data
+ */
 function loadData(dataProcessor) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -13,7 +18,11 @@ function loadData(dataProcessor) {
     xhttp.send();
 }
 
-
+/**
+ * transforms the data as retrieved via ajax into the row format required by google charts
+ * @param originalData data in the format used in data.json
+ * @returns {Array} of rows as required by google charts
+ */
 function transform(originalData) {
     var rows = [];
     for (var i = 0; i < originalData.length; i++) {
@@ -29,6 +38,11 @@ function transform(originalData) {
     return rows;
 }
 
+/**
+ * creates a diagram using google charts from the rows provided as parameter
+ *
+ * @param rows an array of rows as expected by google charts
+ */
 function createDiagram(rows) {
     var data = new google.visualization.DataTable();
 
