@@ -20,6 +20,11 @@
         xhttp.send();
     }
 
+    /**
+     * extracts the colors used in the data
+     * @param originalData
+     * @returns {Array.<String>}
+     */
     function extractColors(originalData) {
         var colorsPlusDay = Object.keys(originalData[originalData.length - 1]);
         return colorsPlusDay.filter(function (color) {
@@ -27,6 +32,17 @@
         });
     }
 
+    /**
+     * Computes for each color how it should be scaled.
+     *
+     * Scaling happens so that the total that the max value is
+     *
+     * (maximum positive number + abs(minimum(negative number)))
+     *
+     * @param originalData
+     * @param colors
+     * @returns {{}}
+     */
     function computeScaling(originalData, colors) {
         var scaling = {};
         colors.forEach(function (color) {
@@ -46,6 +62,17 @@
         return scaling;
     }
 
+    /**
+     * translates a value for a given color to it's correctly scaled value.
+     *
+     * Positive numbers don't get scaled at all. Negative numbers (including -0) get added to a
+     * maximum value obtained from the scaling
+     *
+     * @param scaling defining how the values for different colors should be scaled
+     * @param color the color value (a string)
+     * @param value the value to be scaled.
+     * @returns {*}
+     */
     function translate(scaling, color, value) {
         if (value < 0 || isNegativeZero(value)) {
             return scaling[color] + value;
@@ -57,7 +84,8 @@
     /**
      * transforms the data as retrieved via ajax into the row format required by google charts
      * @param originalData data in the format used in data.json
-     * @returns {Array} of rows as required by google charts
+     * @param colors an array of the color values used (strings)
+ * @returns {Array} of rows as required by google charts
      */
     function transform(originalData, colors) {
         var scaling = computeScaling(originalData, colors);
@@ -81,6 +109,7 @@
     /**
      * creates a diagram using google charts from the rows provided as parameter
      *
+     * @param colors an array of the color values used (strings)
      * @param rows an array of rows as expected by google charts
      */
     function createDiagram(colors, rows) {
@@ -106,6 +135,9 @@
         chart.draw(data, options);
     }
 
+    /**
+     * loads the data using ajax, transforms it and displays it usign google charts
+     */
     function displayBoulderingData() {
 
         loadData(
