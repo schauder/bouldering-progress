@@ -21,55 +21,53 @@
         xhttp.send();
     }
 
+    function extractColors(originalData) {
+        var colorsPlusDay = Object.keys(originalData[originalData.length - 1]);
+        return colorsPlusDay.filter(function (color) {
+            return color != "day"
+        });
+    }
+
+    function computeScaling(originalData, colors) {
+        var scaling = {};
+        colors.forEach(function (color) {
+            var min = originalData.reduce(function (previous, row) {
+                return Math.min(previous, row[color])
+            }, 0);
+            console.log(min);
+
+            var max = null;
+            if (min < 0) {
+                max = 1 + originalData.reduce(function (previous, row) {
+                        return Math.max(previous, row[color])
+                    }, 0) - min;
+            }
+            scaling[color] = max;
+        });
+        return scaling;
+    }
+
+    function translate(scaling, color, value) {
+        if (value < 0 || isNegativeZero(value)) {
+            return scaling[color] + value;
+        } else {
+            return value;
+        }
+    }
+
     /**
      * transforms the data as retrieved via ajax into the row format required by google charts
      * @param originalData data in the format used in data.json
      * @returns {Array} of rows as required by google charts
      */
-    function transform(originalData) {
-
-        function extractColors(originalData) {
-            var colorsPlusDay = Object.keys(originalData[originalData.length - 1]);
-            return colorsPlusDay.filter(function (color) {
-                return color != "day"
-            });
-        }
-
-        function computeScaling(originalData, colors) {
-            var scaling = {};
-            colors.forEach(function (color) {
-                var min = originalData.reduce(function (previous, row) {
-                    return Math.min(previous, row[color])
-                }, 0);
-                console.log(min);
-
-                var max = null;
-                if (min < 0) {
-                    max = 1 + originalData.reduce(function (previous, row) {
-                            return Math.max(previous, row[color])
-                        }, 0) - min;
-                }
-                scaling[color] = max;
-            });
-            return scaling;
-        }
-
-        function translate(color, value) {
-            if (value < 0 || isNegativeZero(value)) {
-                return scaling[color] + value;
-            } else {
-                return value;
-            }
-        }
-
-        var colors = extractColors(originalData);
+    function transform(originalData, colors) {
         var scaling = computeScaling(originalData, colors);
 
         return originalData.map(function (inputRow) {
             return [
                 inputRow.day,
-                translate("yellow", inputRow.yellow), 'color: yellow; stroke-width: 0',
-                translate("green", inputRow.green), 'color: green; stroke-width: 0'
+                translate(scaling, "yellow", inputRow.yellow), 'color: yellow; stroke-width: 0',
+                translate(scaling, "green", inputRow.green), 'color: green; stroke-width: 0'
             ];
         });
     }
@@ -87,6 +85,7 @@
         data.addColumn({type: 'string', role: 'style'});
         data.addColumn('number', 'Green');
         data.addColumn({type: 'string', role: 'style'});
+
         data.addRows(rows);
 
         var options = {
@@ -105,7 +104,7 @@
 
         loadData(
             function (data) {
-                createDiagram(transform(data));
+                createDiagram(transform(data, extractColors(data)));
             }
         );
     }
