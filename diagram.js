@@ -1,8 +1,5 @@
-
-google.charts.load('current', {'packages':['corechart']});
+google.charts.load('current', {'packages': ['corechart']});
 google.charts.setOnLoadCallback(displayBoulderingData);
-
-var colors = ["yellow", "green"];
 
 function isNegativeZero(n) {
     n = Number(n);
@@ -16,22 +13,27 @@ function isNegativeZero(n) {
  */
 function loadData(dataProcessor) {
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
+    xhttp.onreadystatechange = function () {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
-            dataProcessor( JSON.parse(xhttp.responseText));
+            dataProcessor(JSON.parse(xhttp.responseText));
         }
     };
     xhttp.open("GET", "data.json", true);
     xhttp.send();
 }
 
+function extractColors(originalData) {
+    var colorsPlusDay = Object.keys(originalData[originalData.length - 1]);
+    return colorsPlusDay.filter(function(color){return color != "day"});
+}
 /**
  * transforms the data as retrieved via ajax into the row format required by google charts
  * @param originalData data in the format used in data.json
  * @returns {Array} of rows as required by google charts
  */
 function transform(originalData) {
-
+    var colors = extractColors(originalData);
+    console.log(colors);
     var scaling = {};
     colors.forEach(function (color) {
         var min = originalData.reduce(function (previous, row) {
@@ -41,7 +43,7 @@ function transform(originalData) {
 
         var max = null;
         if (min < 0) {
-            max = 1 + originalData.reduce(function(previous, row) {
+            max = 1 + originalData.reduce(function (previous, row) {
                     return Math.max(previous, row[color])
                 }, 0) - min;
         }
@@ -50,13 +52,12 @@ function transform(originalData) {
 
     console.log(scaling);
 
-
-
-    function translate(color, value){
-        if (value < 0 || isNegativeZero(value))
+    function translate(color, value) {
+        if (value < 0 || isNegativeZero(value)) {
             return scaling[color] + value;
-        else
+        } else {
             return value;
+        }
     }
 
     return originalData.map(function (inputRow) {
@@ -98,7 +99,7 @@ function createDiagram(rows) {
 function displayBoulderingData() {
 
     loadData(
-        function(data) {
+        function (data) {
             createDiagram(transform(data));
         }
     );
