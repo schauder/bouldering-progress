@@ -1,4 +1,3 @@
-
 (function () {
     function isNegativeZero(n) {
         n = Number(n);
@@ -64,11 +63,18 @@
         var scaling = computeScaling(originalData, colors);
 
         return originalData.map(function (inputRow) {
-            return [
-                inputRow.day,
-                translate(scaling, "yellow", inputRow.yellow), 'color: yellow; stroke-width: 0',
-                translate(scaling, "green", inputRow.green), 'color: green; stroke-width: 0'
+            var data = [
+                inputRow.day
             ];
+
+            colors.forEach(function (color) {
+                data.push(
+                    translate(scaling, color, inputRow[color]),
+                    'color: ' + color + '; stroke-width: 0'
+                )
+            });
+
+            return data;
         });
     }
 
@@ -77,14 +83,14 @@
      *
      * @param rows an array of rows as expected by google charts
      */
-    function createDiagram(rows) {
+    function createDiagram(colors, rows) {
         var data = new google.visualization.DataTable();
 
         data.addColumn('string', 'Day');
-        data.addColumn('number', 'Yellow');
-        data.addColumn({type: 'string', role: 'style'});
-        data.addColumn('number', 'Green');
-        data.addColumn({type: 'string', role: 'style'});
+        colors.forEach(function (color) {
+            data.addColumn('number', color);
+            data.addColumn({type: 'string', role: 'style'});
+        });
 
         data.addRows(rows);
 
@@ -104,7 +110,8 @@
 
         loadData(
             function (data) {
-                createDiagram(transform(data, extractColors(data)));
+                var colors = extractColors(data);
+                createDiagram(colors, transform(data, colors));
             }
         );
     }
